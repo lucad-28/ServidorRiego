@@ -1,0 +1,235 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: rgb(12, 20, 42);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.skill {
+    width: 250px; /* Modificado */
+    height: 250px; /* Modificado */
+    position: relative;
+}
+
+.outter {
+    height: 250px; /* Modificado */
+    width: 250px; /* Modificado */
+    padding: 40px; /* Ajustado proporcionalmente */
+    box-shadow: 8px 8px 14px -1px rgba(96, 206, 254, 0.15),
+                -8px -8px 14px -1px rgba(12, 20, 42, 0.7); /* Ajustado proporcionalmente */
+    border-radius: 50%;
+}
+
+.inner {
+    height: 170px; /* Ajustado proporcionalmente */
+    width: 170px; /* Ajustado proporcionalmente */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 6px 6px 10px -1px rgba(96, 206, 254, 0.2),
+                inset -6px -6px 10px -1px rgba(12, 20, 42, 0.7),
+                -0.75px -0.75px 0px rgba(12, 20, 42, 1),
+                0.75px 0.75px 0px rgba(12, 20, 42, 0.15),
+                0px 15px 12px -12px rgba(96, 206, 254, 0.05); /* Ajustado proporcionalmente */
+}
+
+.med {
+    font-weight: 600;
+    color: rgb(255, 255, 255);
+    font-size: 38px; /* Ajustado proporcionalmente */
+}
+
+circle {
+    fill: none;
+    stroke: url(#GradientColor);
+    stroke-width: 40px; /* Ajustado proporcionalmente */
+    stroke-dasharray: 660; /* Ajustado proporcionalmente */
+    stroke-dashoffset: 660;
+    animation: 2s linear forwards;
+}
+
+svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+        
+.toggle-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 30px;
+    width: 150px;
+    height: 150px;
+}
+
+.toggle-label {
+    display: inline-block;
+    height: 100px;
+    width: 100px;
+    border-radius: 0% 50% 50% 50%;
+    transform: rotate(45deg);
+    position: relative;
+    transition: background-color 0.3s ease, transform 0.3s ease-out;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white; /* color del texto */
+    font-size: 28px; /* tamaño de fuente */
+    text-align: center; /* alineación del texto */
+}
+
+
+input[type="checkbox"] {
+    visibility: hidden;
+}
+
+input[type="checkbox"]:not(:checked) + .toggle-label {
+    background-color: rgb(27, 53, 80);
+    transform: scale(1.1);
+}
+
+input[type="checkbox"]:checked + .toggle-label {
+    background-color: #0288d1;
+    color: transparent;
+    box-shadow: inset -25px 10px 0px -10px #03a9f4;
+}
+
+.formRiego{
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    width: 350px;
+}
+
+.formRiego .modo{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    color: white;
+    width: 80px;
+    height: 50px;
+}
+.formRiego input[type="number"]{
+    border-radius: 10px;
+    text-align: end;
+    height: 52px;
+    width: 60px;
+    margin: 0 10px;
+    padding: 0 10px;
+    background-color: rgb(27, 53, 80);
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 18px;
+    color: white;
+    border: none;
+    outline: none;
+}
+
+.formRiego input[type="number"]::-webkit-outer-spin-button,
+.formRiego input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.dropdown{
+    position: relative;
+    background-color: rgb(12, 20, 42);
+    width: 80px;
+    height: 50px;
+}
+
+.dropdown::before{
+    content: '';
+    position: absolute;
+    right: 20px;
+    top: 15px;
+}
+
+.dropdown.active::before{
+    color: white;
+}
+
+.dropdown input[readonly]::placeholder{
+    color: rgb(172, 172, 172);
+}
+
+.dropdown input{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    background-color: rgb(27, 53, 80);
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 18px;
+    color: white;
+    border: none;
+    outline: none;
+    box-shadow: 6px 4px 4px -4px rgba(96, 206, 254, 0.15);
+    padding: 12px 20px;
+    border-radius: 10px;
+}
+.dropdown .option{
+    position: absolute;
+    top: 70px;
+    width: 100%;
+    background-color: rgb(27, 53, 80);
+    box-shadow: 0 30px 30px rgba(96, 206, 254, 0.15);
+    border-radius: 10px;
+    overflow: hidden;
+    display: none;
+}
+
+.dropdown.active .option{
+    display: block;
+}
+
+.dropdown .option div{
+    padding: 12px 20px;
+    cursor: pointer;
+}
+
+.dropdown .option div:hover{
+    background: #176086;
+    color: white;
+}
+
+.flecha {
+    margin: 10px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent; /* Ancho del triángulo */
+    border-right: 10px solid transparent; /* Ancho del triángulo */
+    border-bottom: 20px solid #03a9f4; /* Altura y color del triángulo */
+    transform: rotate(90deg);
+}
+.HoraProgramada{
+    color: white;
+    font-size: 20px;
+    overflow: hidden;
+    display: none;
+}
+.formRiego.Programado .modo, .formRiego.Programado .duration, .formRiego.Programado .dropdown, .formRiego.Programado .flecha{
+    overflow: hidden;
+    display: none;
+}
+
+.formRiego.Programado .HoraProgramada{
+    overflow: visible;
+    display: block;
+}

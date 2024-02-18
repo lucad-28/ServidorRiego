@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <title>Sistema de irrigación</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="{% static 'webserver/style.css' %}" rel="stylesheet">
+    </head>
+    <body>
+        <div class="skill">
+            <div class="outter">
+                <div class="inner">
+                    <div><span id="number" class="med">{{humedad}}<span class="med">%</span></div>
+                </div>
+            </div>
+            
+            <svg width="250" height="250">
+                <defs>
+                    <linearGradient id="GradientColor">
+                    <stop offset="0%" stop-color="#4c99ba"/>
+                    <stop offset="100%" stop-color="#69d1f9"/>
+                    </linearGradient>
+                </defs>
+                <circle id="bar" cx="125" cy="125" r="105" stroke-linecap="round" />
+            </svg>
+            
+        </div>
+        <div class="toggle-container">
+            {% if regarForzado %}
+                <input type="checkbox" id="gota" onchange="onPressed(this)" checked="true">
+                <label for="gota" class="toggle-label" id = "lGota">Gota</label>
+            {% else %}
+                <input type="checkbox" id="gota" onchange="onPressed(this)" checked="false">
+                <label for="gota" class="toggle-label" id = "lGota">Gota</label>
+            {% endif %}
+        </div>
+        <div class="formRiego">
+            <div class="HoraProgramada">Se regara a las 14:00 del 11/02/2023</div>
+            <div class="modo" id="modoProgramado">Regar en</div>
+            <input type="number" id="duracionRiego" class="duration" placeholder="0">
+            <div class="dropdown">
+                <input type="text" id="timer" class="textBox" placeholder="s/m/h" readonly>
+                <div class="option">
+                    <div onclick="show('seg')">seg</div>
+                    <div onclick="show('min')">min</div>
+                    <div onclick="show('horas')">horas</div>
+                </div>
+            </div>
+            <div class="flecha"></div>
+        </div>            
+        <script src="{% static 'webserver/script.js' %}"></script>
+    </body>
+</html>
