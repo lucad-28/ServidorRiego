@@ -225,7 +225,8 @@ input[type="checkbox"]:checked + .toggle-label {
     overflow: hidden;
     display: none;
 }
-.formRiego.Programado .modo, .formRiego.Programado .duration, .formRiego.Programado .dropdown, .formRiego.Programado .flecha{
+.formRiego.Programado .modo, .formRiego.Programado .duration, .formRiego.Programado .dropdown, .formRiego.Programado .flecha
+,.formRiego.Programado + .microfono{
     overflow: hidden;
     display: none;
 }
@@ -257,8 +258,8 @@ input[type="checkbox"]:checked + .toggle-label {
     border: 2px solid;
     border-color: white;
     border-top: 0;
-    margin-top: 3px;
-    margin-right: 30px;
+    margin-top: -1px;
+    margin-right: 32px;
     
 }
 

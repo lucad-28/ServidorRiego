@@ -1,10 +1,13 @@
 const time=100;
 const url_ = "http://127.0.0.1:8000/webserver"     
+var regando = "";
 
 document.addEventListener('DOMContentLoaded', ()=>{
     console.log("document ready");
     setTimeout(updateHumedad,time);
     setTimeout(updateGota,time);
+    setTimeout(rptProgramar,time);
+    setTimeout(estadoRegadoProgramado,time);
 });
 
 const humDiv = document.getElementById('number');
@@ -100,9 +103,9 @@ flecha.onclick = function(){
     var datosEnviar = JSON.stringify(programado);
     console.log("datos a enviar", datosEnviar);
     */
-    var soli= "modo="+encodeURIComponent(modo)+"&duracion="+encodeURIComponent(duracion)+"&timer="+encodeURIComponent(timer);
+    var soli= "via=escrito&"+"modo="+encodeURIComponent(modo)+"&duracion="+encodeURIComponent(duracion)+"&timer="+encodeURIComponent(timer);
     let programarR = new XMLHttpRequest();
-    programarR.open("POST",url_ + "/programar?" + soli,true);
+    programarR.open("POST",url_ + "/rcomando?" + soli,true);
     //programarR.open("POST","/programar",true);
     /*
     programarR.setRequestHeader("Content-Type", "application/json");
@@ -148,8 +151,10 @@ micro.onclick = function(){
                 console.log("Captura detenida por tiempo");
                 recognition.stop();
                 setTimeout(function(){
-                    console.log("comando enviado" + comandoenviado)
-                    enviarComando();
+                    if(comandoenviado!==""){
+                        console.log("comando enviado: " + comandoenviado)
+                        enviarComando();
+                    }
                 },1000);
             }
         },6000);
@@ -157,8 +162,10 @@ micro.onclick = function(){
         console.log("terminado");
         recognition.stop();
         setTimeout(function(){
-            console.log("comando enviado" + comandoenviado)
-            enviarComando();
+            if(comandoenviado!==""){
+                console.log("comando enviado" + comandoenviado)
+                enviarComando();
+            }
         },1000);      
     }
 }
@@ -168,4 +175,53 @@ function enviarComando(){
     rcom.open("POST", url_ + "/rcomando?contenido="+ comandoenviado);
     comandoenviado = "";
     rcom.send();
+    formRegar.classList.add('Programado');
+}
+
+var mensajeProgramado = document.querySelector('.HoraProgramada')
+function rptProgramar(processRpt){
+    let rpt = new XMLHttpRequest();
+    
+    rpt.onreadystatechange = () => {
+        if(rpt.readyState === 4 && rpt.status === 200){
+            var Respuesta = rpt.responseText;
+            console.log(Respuesta);
+            if(mensajeProgramado){
+                if(Respuesta === "Respuesta aun no recibida del servidor"){
+                    mensajeProgramado.innerText = Respuesta;
+                }else if(Respuesta === "Comando no reconocido"){
+                    mensajeProgramado.innerText = Respuesta;
+                    setTimeout(function(){
+                        formRegar.classList.remove('Programado');
+                    },1000);
+                }else if(Respuesta.includes("Se regara en")){
+                    mensajeProgramado.innerText = Respuesta;
+                }
+            }else{
+                mensajeProgramado = document.querySelector('.HoraProgramada')
+            }
+            
+        }
+    }
+
+    rpt.open("GET", url_ + "/rptcomando");
+    rpt.send();
+    setTimeout(rptProgramar, time);
+}
+
+function estadoRegadoProgramado(processEst){
+    let estado = new XMLHttpRequest();
+    
+    estado.onreadystatechange = () => {
+        if(estado.readyState === 4 && estado.status === 200){
+            var rpt = estado.responseText;
+            if(rpt == "False" && mensajeProgramado.innerText.includes("Se regara en")){
+                mensajeProgramado.innerText = "";
+                formRegar.classList.remove('Programado');
+            }
+        }
+    }
+    estado.open("GET", url_ + "/riegoprog");
+    estado.send();
+    setTimeout(estadoRegadoProgramado, time);    
 }

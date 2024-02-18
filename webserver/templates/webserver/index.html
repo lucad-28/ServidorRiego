@@ -35,8 +35,17 @@
                 <label for="gota" class="toggle-label" id = "lGota">Gota</label>
             {% endif %}
         </div>
-        <div class="formRiego">
-            <div class="HoraProgramada">Se regara a las 14:00 del 11/02/2023</div>
+        <div class="formRiego {% if regadoProgramado %}Programado{% endif %}">
+            
+            <div class="HoraProgramada">
+                {% if esperandoRespuesta %}
+                    Esperando la respuesta del dispositivo
+                {% else %}
+                    {{ solicitudRegado.modo }} en {{ solicitudRegado.duracion }} {{ solicitudRegado.timer }}
+                {% endif %}
+            </div>
+            
+            <div class="HoraProgramada"></div>
             <div class="modo" id="modoProgramado">Regar en</div>
             <input type="number" id="duracionRiego" class="duration" placeholder="0">
             <div class="dropdown">
@@ -48,6 +57,7 @@
                 </div>
             </div>
             <div class="flecha"></div>
+            
         </div>
         <div class="microfono">
             

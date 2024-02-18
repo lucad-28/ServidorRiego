@@ -7,5 +7,6 @@ urlpatterns = [
     path("regar", views.regar, name="regar"),
     path("programar", views.programar, name="programar"),
     path("rcomando",views.rcomando,name="comando"),
-    path("rptacomando",views.rptcomando,name="rptacomando")
+    path("rptcomando",views.rptcomando,name="rptcomando"),
+    path("riegoprog", views.riegoprog, name="riegoprog")
 ]
