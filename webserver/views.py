@@ -4,6 +4,12 @@ from django.views.decorators.csrf import csrf_exempt
 
 percenHum = 0
 regarForzado = False
+regadoProgramado = False
+solicitudRegado = {
+    "modo": "",
+    "duracion": 0,
+    "timer": ""
+}
 
 # Create your views here.
 def index(request):
@@ -34,3 +40,17 @@ def regar(request):
         return HttpResponse(f"Regar actualizado a: {regarForzado}", content_type="text/plain")
     elif request.method == 'GET':
         return HttpResponse(str(regarForzado).lower(), content_type="text/plain")
+
+@csrf_exempt
+def programar(request):
+    global regadoProgramado, solicitudRegado
+    if request.method == 'POST':
+        solicitudRegado = request.GET
+        regadoProgramado = True
+        print(f"{solicitudRegado}")
+        return HttpResponse(f"{solicitudRegado["modo"]}, {solicitudRegado["duracion"]}, {solicitudRegado["timer"]}", content_type="text/plain")
+    elif request.method == 'GET':
+        if regadoProgramado == True:
+            return HttpResponse(f"{solicitudRegado["modo"]}, {solicitudRegado["duracion"]}, {solicitudRegado["timer"]}", content_type="text/plain")
+        else:
+            return HttpResponse("No se encuentra programacion alguna", content_type = "text/plain")

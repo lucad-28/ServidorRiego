@@ -102,7 +102,7 @@ flecha.onclick = function(){
     */
     var soli= "modo="+encodeURIComponent(modo)+"&duracion="+encodeURIComponent(duracion)+"&timer="+encodeURIComponent(timer);
     let programarR = new XMLHttpRequest();
-    programarR.open("POST","/programar?"+soli,true);
+    programarR.open("POST",url_ + "/programar?" + soli,true);
     //programarR.open("POST","/programar",true);
     /*
     programarR.setRequestHeader("Content-Type", "application/json");
