@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.middleware.csrf import get_token
 
 percenHum = 0
 regarForzado = False
@@ -29,7 +30,7 @@ def humedad(request):
         return HttpResponse(f"Valor actualizado a {percenHum}", content_type="text/plain")
     elif request.method == 'GET':
         return HttpResponse(str(percenHum), content_type="text/plain")
-    
+
 @csrf_exempt
 def regar(request):
     global regarForzado

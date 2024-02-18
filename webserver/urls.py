@@ -5,5 +5,5 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("humedad", views.humedad, name="humedad"),
     path("regar", views.regar, name="regar"),
-    path("programar", views.programar, name="programar")
+    path("programar", views.programar, name="programar"),
 ]
