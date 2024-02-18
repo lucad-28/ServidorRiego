@@ -117,3 +117,55 @@ flecha.onclick = function(){
     //programarR.send("plain=" + encodeURIComponent(datosEnviar));
     programarR.send();
 }
+
+let micro = document.querySelector('.microfono');
+var comandoenviado = "";
+const recognition = new webkitSpeechRecognition();
+
+recognition.continuous = true;
+recognition.lang = 'es-ES';
+recognition.interimResult = false;
+
+recognition.onresult = (event) => {
+    const texto = event.results[event.results.length - 1][0].transcript;
+    comandoenviado += texto;
+    console.log(texto);
+}
+
+recognition.onerror = (event) => {
+    console.log(`Speech recognition error detected: ${event.error}`);
+    console.log(`Additional information: ${event.message}`);
+};
+
+micro.onclick = function(){
+    micro.classList.toggle('grabando');
+    if(micro.classList.contains('grabando')){
+        console.log("iniciado");
+        recognition.start();
+        timeoutID = setTimeout(function(){
+            if(micro.classList.contains('grabando')){
+                micro.classList.toggle('grabando');
+                console.log("Captura detenida por tiempo");
+                recognition.stop();
+                setTimeout(function(){
+                    console.log("comando enviado" + comandoenviado)
+                    enviarComando();
+                },1000);
+            }
+        },6000);
+    }else{
+        console.log("terminado");
+        recognition.stop();
+        setTimeout(function(){
+            console.log("comando enviado" + comandoenviado)
+            enviarComando();
+        },1000);      
+    }
+}
+
+function enviarComando(){
+    let rcom = new XMLHttpRequest();
+    rcom.open("POST", url_ + "/rcomando?contenido="+ comandoenviado);
+    comandoenviado = "";
+    rcom.send();
+}

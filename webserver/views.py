@@ -11,6 +11,14 @@ solicitudRegado = {
     "duracion": 0,
     "timer": ""
 }
+comando = {
+    "recibido": False,
+    "contenido": "",
+    "respuesta": {
+        "recibida": False,
+        "valido": False,
+    }
+}
 
 # Create your views here.
 def index(request):
@@ -55,3 +63,36 @@ def programar(request):
             return HttpResponse(f"{solicitudRegado["modo"]}, {solicitudRegado["duracion"]}, {solicitudRegado["timer"]}", content_type="text/plain")
         else:
             return HttpResponse("No se encuentra programacion alguna", content_type = "text/plain")
+
+@csrf_exempt
+def rcomando(request):
+    global comando
+    if request.method == 'POST':
+        comando["recibido"] = True
+        comando["contenido"] = request.GET.get("contenido")
+        print(f"Comando recibido: {comando['recibido']} y contenido {comando['contenido']}")
+        return HttpResponse("Comando ingresado con exito", content_type ="text/plain")
+    elif request.method == 'GET':
+        if comando["recibido"] == True:
+            comando["recibido"] = False
+            contenido = comando["contenido"]
+            return HttpResponse(f"{contenido}",content_type="text/plain")
+        else:
+            return HttpResponse("Comando no recibido", content_type="text/plain")
+@csrf_exempt
+def rptcomando(request):
+    global comando
+    if request.method == 'POST':
+        comando["respuesta"]["estado"] = request.GET.get('estado')
+        comando["respuesta"]["recibida"] = True
+        if comando["respuesta"]["estado"] == "valido":
+            return programar(request)
+    elif request.method == 'GET':
+        if comando["respuesta"]["recibida"] == True:
+            comando["respuesta"]["recibida"] = False
+            if comando["respuesta"]["valido"] == "valido":
+                return programar(request)
+            elif comando["respuesta"]["valido"] == "invalido":
+                return HttpResponse("Comando no reconocido", content_type ="text/plain")
+        else:
+            return HttpResponse("Respuesta no recibida", content="text/plain")
