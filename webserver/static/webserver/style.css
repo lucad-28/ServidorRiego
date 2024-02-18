@@ -14,6 +14,7 @@ body {
 }
 
 .skill {
+    margin: 10px;
     width: 250px; /* Modificado */
     height: 250px; /* Modificado */
     position: relative;
@@ -233,6 +234,91 @@ input[type="checkbox"]:checked + .toggle-label {
     overflow: visible;
     display: block;
 }
+.microfono{
+    margin-bottom: 20px;
+    padding-right: 20px;
+    width: 100%;
+    height: 100px;
+    display: flex;
+    justify-content: end;
+}
+.olas{
+    margin: 0;
+    padding: 0;
+    position: relative;
+    width: 400px;
+    height: 100px;
+    background: #0d2953;
+    border-radius: 60px;
+    overflow: hidden;
+}
 
+.olas::before, .olas::after{
+    content: "";
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.olas .ola{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    background: url(images/wave.png);
+    background-size: 300px 40px;
+}
+
+.olas .ola.ola1{
+    animation: animate 30s linear infinite;
+    z-index: 1000;
+    opacity: 1;
+    animation-delay: 0s;
+    bottom: 0;
+}
+
+.olas .ola.ola3{
+    animation: animate 15s linear infinite;
+    z-index: 998;
+    opacity: 0.2;
+    animation-delay: -2s;
+    bottom: 8px;
+}
+
+@keyframes animate {
+    0%{
+        background-position-x: 0;
+    }
+    100%{
+        background-position-x: 300px;
+    }
+}
+
+.olas .ola.ola4{
+    animation: animate2 5s linear infinite;
+    z-index: 997;
+    opacity: 0.7;
+    animation-delay: -5s;
+    bottom: 12px;
+}
+
+.olas .ola.ola2{
+    animation: animate2 15s linear infinite;
+    z-index: 999;
+    opacity: 0.5;
+    animation-delay: -5s;
+    bottom: 5px;
+}
+
+@keyframes animate2 {
+    0%{
+        background-position-x: 0;
+    }
+    100%{
+        background-position-x: -300px;
+    }
+}
 
 
