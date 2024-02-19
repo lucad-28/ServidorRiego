@@ -84,7 +84,7 @@ def rcomando(request):
             comando['contenido'] = f"&{request.GET.get('modo')}, {request.GET.get('duracion')}, {request.GET.get('timer')}"
         else:
             mensaje = request.GET.get('contenido')
-            duracion, timer = examinar_mensaje(mensaje=mensaje)
+            duracion, timer = examinar_mensaje(mensaje)
             comando['contenido'] = f"regaren, {duracion}, {timer}"            
         print(f"Comando recibido: {comando['recibido']} y contenido {comando['contenido']}")
         return HttpResponse("Comando ingresado con exito", content_type ="text/plain")
@@ -138,11 +138,12 @@ def riegoprog(request):
 def examinar_mensaje(mensaje):
         
     # Patrón de expresión regular para buscar la palabra clave, el número y la unidad de tiempo
-    patron = r'(enc(?:iende|ender)|activ(?:a|ar|es)|prend(?:e|er|as))\s+?(?:el sistema|el regado)\s+(?:en|dentro de)\s+(\d+)\s+(segundos?|minutos?|horas?)'
+    patron = r'(enc(?:iende|ender)|activ(?:a|ar|es)|prend(?:e|er|as))\s+?(?:el sistema|sistema|el regado|regado)\s+(?:en|dentro de)\s+(\d+)\s+(segundos?|minutos?|horas?)'
     
     # Buscar coincidencias en el mensaje
     coincidencias = re.search(patron, mensaje, re.IGNORECASE)
-    
+    numero = 0
+    unidad_tiempo = ""
     if coincidencias:
         palabra_clave = coincidencias.group(1)
         numero = int(coincidencias.group(2))
@@ -150,4 +151,5 @@ def examinar_mensaje(mensaje):
     else:
         numero = None
         unidad_tiempo = None
+
     return numero, unidad_tiempo
