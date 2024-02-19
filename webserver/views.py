@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.middleware.csrf import get_token
+import re
 
 percenHum = 0
 regarForzado = False
@@ -83,7 +83,9 @@ def rcomando(request):
         if(request.GET.get('via')):
             comando['contenido'] = f"&{request.GET.get('modo')}, {request.GET.get('duracion')}, {request.GET.get('timer')}"
         else:
-            comando['contenido'] = request.GET.get('contenido')
+            mensaje = request.GET.get('contenido')
+            duracion, timer = examinar_mensaje(mensaje=mensaje)
+            comando['contenido'] = f"regaren, {duracion}, {timer}"            
         print(f"Comando recibido: {comando['recibido']} y contenido {comando['contenido']}")
         return HttpResponse("Comando ingresado con exito", content_type ="text/plain")
     elif request.method == 'GET':
@@ -132,3 +134,20 @@ def riegoprog(request):
         return HttpResponse(f"Solicitud pendiente cambiada a {solicitudRegado['pendiente']}",content_type="text/plain")
     elif request.method == 'GET':
         return HttpResponse(f"{solicitudRegado['pendiente']}", content_type="text/plain")
+    
+def examinar_mensaje(mensaje):
+        
+    # Patrón de expresión regular para buscar la palabra clave, el número y la unidad de tiempo
+    patron = r'(enc(?:iende|ender)|activ(?:a|ar|es)|prend(?:e|er|as))\s+?(?:el sistema|el regado)\s+(?:en|dentro de)\s+(\d+)\s+(segundos?|minutos?|horas?)'
+    
+    # Buscar coincidencias en el mensaje
+    coincidencias = re.search(patron, mensaje, re.IGNORECASE)
+    
+    if coincidencias:
+        palabra_clave = coincidencias.group(1)
+        numero = int(coincidencias.group(2))
+        unidad_tiempo = coincidencias.group(3)
+    else:
+        numero = None
+        unidad_tiempo = None
+    return numero, unidad_tiempo
