@@ -58,9 +58,10 @@ def programar(request):
     global solicitudRegado, comando
     if request.method == 'POST':
         solicitudRegado['pendiente'] = True
-        solicitudRegado['modo'] = request.GET.get('modo')
-        solicitudRegado['duracion'] = request.GET.get('duracion')
-        solicitudRegado['timer'] = request.GET.get('timer')
+        if(request.GET.get('modo') and request.GET.get('duracion') and request.GET.get('timer')):
+            solicitudRegado['modo'] = request.GET.get('modo')
+            solicitudRegado['duracion'] = request.GET.get('duracion')
+            solicitudRegado['timer'] = request.GET.get('timer')
         comando['recibido'] = True
         comando['respuesta']['recibida'] = True
         print(f"{solicitudRegado}")
