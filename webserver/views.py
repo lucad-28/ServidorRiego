@@ -58,10 +58,6 @@ def programar(request):
     global solicitudRegado, comando
     if request.method == 'POST':
         solicitudRegado['pendiente'] = True
-        if(request.GET.get('modo') and request.GET.get('duracion') and request.GET.get('timer')):
-            solicitudRegado['modo'] = request.GET.get('modo')
-            solicitudRegado['duracion'] = request.GET.get('duracion')
-            solicitudRegado['timer'] = request.GET.get('timer')
         comando['recibido'] = True
         comando['respuesta']['recibida'] = True
         print(f"{solicitudRegado}")
@@ -78,7 +74,7 @@ def programar(request):
 
 @csrf_exempt
 def rcomando(request):
-    global comando
+    global comando, solicitudRegado
     if request.method == 'POST':
         comando['recibido'] = True
         if(request.GET.get('via')):
@@ -86,7 +82,11 @@ def rcomando(request):
         else:
             mensaje = request.GET.get('contenido')
             duracion, timer = examinar_mensaje(mensaje)
-            comando['contenido'] = f"regaren, {duracion}, {timer}"            
+            comando['contenido'] = f"regaren, {duracion}, {timer}" 
+        
+        solicitudRegado['modo'] = request.GET.get('modo')
+        solicitudRegado['duracion'] = request.GET.get('duracion')
+        solicitudRegado['timer'] = request.GET.get('timer')          
         print(f"Comando recibido: {comando['recibido']} y contenido {comando['contenido']}")
         return HttpResponse("Comando ingresado con exito", content_type ="text/plain")
     elif request.method == 'GET':
