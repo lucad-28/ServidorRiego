@@ -27,7 +27,7 @@ def index(request):
     return render(request, "webserver/index.html", {
         'humedad': percenHum,
         'regarForzado': regarForzado,
-        'regadoProgramado': comando['recibido']==True,
+        'regadoProgramado': solicitudRegado['pendiente']==True,
         'esperandoRespuesta': comando['recibido'] == True and comando['respuesta']['recibida'] == False
     })
 
