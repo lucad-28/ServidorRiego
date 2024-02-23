@@ -196,9 +196,7 @@ function rptProgramar(processRpt){
                     }
                     mensajeProgramado.innerText = Respuesta;
                 }else if(Respuesta === "Comando no reconocido"){
-                    if(!formRegar.classList.contains('Programado')){
-                        formRegar.classList.add('Programado');
-                    }
+                    
                     mensajeProgramado.innerText = Respuesta;
                     setTimeout(function(){
                         formRegar.classList.remove('Programado');
