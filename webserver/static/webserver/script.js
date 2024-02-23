@@ -189,19 +189,29 @@ function rptProgramar(processRpt){
             console.log("rptProgramar");
             console.log(Respuesta);
             if(mensajeProgramado){
-                if(!formRegar.classList.contains('Programado')){
-                    formRegar.classList.add('Programado');
-                }
+                
                 if(Respuesta === "Esperando la respuesta del dispositivo"){
+                    if(!formRegar.classList.contains('Programado')){
+                        formRegar.classList.add('Programado');
+                    }
                     mensajeProgramado.innerText = Respuesta;
                 }else if(Respuesta === "Comando no reconocido"){
+                    if(!formRegar.classList.contains('Programado')){
+                        formRegar.classList.add('Programado');
+                    }
                     mensajeProgramado.innerText = Respuesta;
                     setTimeout(function(){
                         formRegar.classList.remove('Programado');
                     },1000);
                 }else if(Respuesta.includes("Se regara")){
+                    if(!formRegar.classList.contains('Programado')){
+                        formRegar.classList.add('Programado');
+                    }
                     mensajeProgramado.innerText = Respuesta;
                 }else if(Respuesta.includes("Se encenderan")){
+                    if(!formRegar.classList.contains('Programado')){
+                        formRegar.classList.add('Programado');
+                    }
                     mensajeProgramado.innerText = Respuesta;
                 }
             }else{
