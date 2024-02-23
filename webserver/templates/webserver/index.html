@@ -37,15 +37,14 @@
         </div>
         <div class="formRiego {% if regadoProgramado %}Programado{% endif %}">
             
-            <div class="HoraProgramada">
-                {% if esperandoRespuesta %}
+            <div class="HoraProgramada" id="MensajeProgramado">
+                {% if esperandoRespuesta or not regadoProgramado %}
                     Esperando la respuesta del dispositivo
                 {% else %}
                     {{ solicitudRegado.modo }} en {{ solicitudRegado.duracion }} {{ solicitudRegado.timer }}
                 {% endif %}
             </div>
             
-            <div class="HoraProgramada"></div>
             <div class="modo" id="modoProgramado">Regar en</div>
             <input type="number" id="duracionRiego" class="duration" placeholder="0">
             <div class="dropdown">

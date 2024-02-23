@@ -5,6 +5,7 @@ import re
 
 percenHum = 0
 regarForzado = False
+encenderLuces = False
 solicitudRegado = {
     'pendiente': False,
     'modo': "",
@@ -27,7 +28,7 @@ def index(request):
     return render(request, "webserver/index.html", {
         'humedad': percenHum,
         'regarForzado': regarForzado,
-        'regadoProgramado': solicitudRegado['pendiente']==True,
+        'regadoProgramado': comando['recibido'] == True,
         'esperandoRespuesta': comando['recibido'] == True and comando['respuesta']['recibida'] == False
     })
 
@@ -74,19 +75,35 @@ def programar(request):
 
 @csrf_exempt
 def rcomando(request):
-    global comando, solicitudRegado
+    global comando, solicitudRegado, encenderLuces, regarForzado
     if request.method == 'POST':
         comando['recibido'] = True
+        comando['respuesta']['recibida'] = False
         if(request.GET.get('via')):
             comando['contenido'] = f"&{request.GET.get('modo')}, {request.GET.get('duracion')}, {request.GET.get('timer')}"
+            solicitudRegado['modo'] = request.GET.get('modo')
+            solicitudRegado['duracion'] = request.GET.get('duracion')
+            solicitudRegado['timer'] = request.GET.get('timer')  
         else:
             mensaje = request.GET.get('contenido')
-            duracion, timer = examinar_mensaje(mensaje)
-            comando['contenido'] = f"regaren, {duracion}, {timer}" 
+            modo, duracion, timer = examinar_mensaje(mensaje)
+            solicitudRegado['modo'] = modo
+            solicitudRegado['duracion'] = duracion
+            solicitudRegado['timer'] = timer
+            comando['contenido'] = f"{modo}, {duracion}, {timer}" 
+            if modo == "lucesInmediato":
+                encenderLuces = True
+                solicitudRegado['duracion'] = 0
+                solicitudRegado['timer'] = 'seg'
+                comando['contenido'] = f"{modo}, {solicitudRegado['duracion']}, {solicitudRegado['timer']}" 
+                return HttpResponse(f"Luces encendidas", content_type="text/plain")
+            if modo == "regarInmediato":
+                regarForzado = True
+                solicitudRegado['duracion'] = 0
+                solicitudRegado['timer'] = 'seg'
+                comando['contenido'] = f"{modo}, {solicitudRegado['duracion']}, {solicitudRegado['timer']}" 
+                return HttpResponse(f"Regado iniciado", content_type="text/plain")
         
-        solicitudRegado['modo'] = request.GET.get('modo')
-        solicitudRegado['duracion'] = request.GET.get('duracion')
-        solicitudRegado['timer'] = request.GET.get('timer')          
         print(f"Comando recibido: {comando['recibido']} y contenido {comando['contenido']}")
         return HttpResponse("Comando ingresado con exito", content_type ="text/plain")
     elif request.method == 'GET':
@@ -104,24 +121,28 @@ def rptcomando(request):
         if comando['respuesta']['valido'] == 'valido':
             return programar(request)
         elif comando['respuesta']['valido'] == "invalido":
-
             return HttpResponse("Comando no reconocido", content_type ="text/plain")
     elif request.method == 'GET':
         if comando['respuesta']['recibida'] == True and comando['recibido'] == True:
-            comando['respuesta']['recibida'] = False
             if comando['respuesta']['valido'] == 'valido':
-                return programar(request)
+                if(solicitudRegado['modo'] == "regaren"):
+                    return HttpResponse(f"Se regara en {solicitudRegado['duracion']} {solicitudRegado['timer']}", content_type="text/plain")
+                elif(solicitudRegado['modo'] == 'lucesen'):
+                    return HttpResponse(f"Se encenderan las luces en {solicitudRegado['duracion']} {solicitudRegado['timer']}", content_type="text/plain")
+                elif(solicitudRegado['modo'] == 'lucesInmediato'):
+                    return HttpResponse(f"Se encenderan las luces", content_type="text/plain")
+                elif(solicitudRegado['modo'] == "regarInmediato"):
+                    return HttpResponse(f"Se regara de inmediato", content_type="text/plain")
+                
             elif comando['respuesta']['valido'] == "invalido":
                 comando['recibido'] = False
                 comando['contenido'] = ""
                 comando['respuesta']['valido'] = ""
                 comando['respuesta']['recibida'] = False
-                solicitudRegado['pendiente'] == False
+                solicitudRegado['pendiente'] = False
                 return HttpResponse("Comando no reconocido", content_type ="text/plain")
         elif comando['respuesta']['recibida'] == False and comando['recibido'] == True:
-            return HttpResponse("Respuesta aun no recibida del servidor", content_type="text/plain")
-        elif solicitudRegado['pendiente'] == True:
-            return HttpResponse(f"Se regara en {solicitudRegado['duracion']} {solicitudRegado['timer']}", content_type="text/plain")
+            return HttpResponse("Esperando la respuesta del dispositivo", content_type="text/plain")
         else:
             return HttpResponse("No hay comando pendiente", content_type="text/plain")
 
@@ -132,6 +153,11 @@ def riegoprog(request):
         if request.GET.get('pendiente'):
             print(f"{request.GET.get('pendiente')}")
             solicitudRegado['pendiente'] = bool(request.GET.get('pendiente').lower() == "true")
+            comando['recibido'] = False
+            comando['contenido'] = ""
+            comando['respuesta']['valido'] = ""
+            comando['respuesta']['recibida'] = False
+            solicitudRegado['pendiente'] = False
         return HttpResponse(f"Solicitud pendiente cambiada a {solicitudRegado['pendiente']}",content_type="text/plain")
     elif request.method == 'GET':
         return HttpResponse(f"{solicitudRegado['pendiente']}", content_type="text/plain")
@@ -139,18 +165,42 @@ def riegoprog(request):
 def examinar_mensaje(mensaje):
         
     # Patrón de expresión regular para buscar la palabra clave, el número y la unidad de tiempo
-    patron = r'(enc(?:iende|ender)|activ(?:a|ar|es)|prend(?:e|er|as))\s+?(?:el sistema|sistema|el regado|regado)\s+(?:en|dentro de)\s+(\d+)\s+(segundos?|minutos?|horas?)'
-    
+    patronregar = r'(enc(?:iende|ender)|activ(?:a|ar|es)|prend(?:e|er|as))\s+?(?:el sistema|sistema|el regado|regado)\s+(?:en|dentro de)\s+(\d+)\s+(segundos?|minutos?|horas?)'
+    patronregarInmediato = r'(enc(?:iende|ender)|activ(?:a|ar|es)|prend(?:e|er|as))\s+?(?:el sistema?|sistema?|el regado?|regado?)'
+    patronluz = r'(enc(?:iende|ender)|activ(?:a|ar|es)|prend(?:e|er|as))\s+?(?:las luces|luces|la luz|el led)\s+(?:en|dentro de)\s+(\d+)\s+(segundos?|minutos?|horas?)'
+    patronluzInmediato = r'(enc(?:iende|ender)|activ(?:a|ar|es)|prend(?:e|er|as))\s+?(?:las luces?|luces?|la luz?|el led?)'
     # Buscar coincidencias en el mensaje
-    coincidencias = re.search(patron, mensaje, re.IGNORECASE)
+    coincidencias = re.search(patronregar, mensaje, re.IGNORECASE)
+    modo = ""
     numero = 0
     unidad_tiempo = ""
     if coincidencias:
         palabra_clave = coincidencias.group(1)
         numero = int(coincidencias.group(2))
         unidad_tiempo = coincidencias.group(3)
+        modo = "regaren"
     else:
-        numero = None
-        unidad_tiempo = None
+        coincidencias = re.search(patronluz, mensaje, re.IGNORECASE)
+        if coincidencias:
+            palabra_clave = coincidencias.group(1)
+            numero = int(coincidencias.group(2))
+            unidad_tiempo = coincidencias.group(3)
+            modo = "lucesen"
+        else:
+            coincidencias = re.search(patronluzInmediato, mensaje, re.IGNORECASE)
+            if coincidencias:
+                modo = "lucesInmediato"
+                numero = None
+                unidad_tiempo = None
+            else:
+                coincidencias = re.search(patronregarInmediato, mensaje, re.IGNORECASE)
+                if coincidencias:
+                    modo = "regarInmediato"
+                    numero = None
+                    unidad_tiempo = None
+                else:
+                    modo = None
+                    numero = None
+                    unidad_tiempo = None
 
-    return numero, unidad_tiempo
+    return modo, numero, unidad_tiempo

@@ -108,6 +108,8 @@ input[type="checkbox"]:checked + .toggle-label {
     box-shadow: inset -25px 10px 0px -10px #03a9f4;
 }
 
+
+
 .formRiego{
     position: relative;
     display: flex;

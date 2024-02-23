@@ -151,7 +151,7 @@ micro.onclick = function(){
                 console.log("Captura detenida por tiempo");
                 recognition.stop();
                 setTimeout(function(){
-                    if(comandoenviado!==""){
+                    if(comandoenviado!=="" && comandoenviado){
                         console.log("comando enviado: " + comandoenviado)
                         enviarComando();
                     }
@@ -175,30 +175,34 @@ function enviarComando(){
     rcom.open("POST", url_ + "/rcomando?contenido="+ comandoenviado);
     comandoenviado = "";
     rcom.send();
+    
     formRegar.classList.add('Programado');
 }
 
-var mensajeProgramado = document.querySelector('.HoraProgramada')
+var mensajeProgramado = document.getElementById('MensajeProgramado');
 function rptProgramar(processRpt){
     let rpt = new XMLHttpRequest();
     
     rpt.onreadystatechange = () => {
         if(rpt.readyState === 4 && rpt.status === 200){
             var Respuesta = rpt.responseText;
+            console.log("rptProgramar");
             console.log(Respuesta);
             if(mensajeProgramado){
-                if(Respuesta === "Respuesta aun no recibida del servidor"){
+                if(Respuesta === "Esperando la respuesta del dispositivo"){
                     mensajeProgramado.innerText = Respuesta;
                 }else if(Respuesta === "Comando no reconocido"){
                     mensajeProgramado.innerText = Respuesta;
                     setTimeout(function(){
                         formRegar.classList.remove('Programado');
                     },1000);
-                }else if(Respuesta.includes("Se regara en")){
+                }else if(Respuesta.includes("Se regara")){
+                    mensajeProgramado.innerText = Respuesta;
+                }else if(Respuesta.includes("Se encenderan")){
                     mensajeProgramado.innerText = Respuesta;
                 }
             }else{
-                mensajeProgramado = document.querySelector('.HoraProgramada')
+                mensajeProgramado = document.getElementById('MensajeProgramado');
             }
             
         }
@@ -215,7 +219,7 @@ function estadoRegadoProgramado(processEst){
     estado.onreadystatechange = () => {
         if(estado.readyState === 4 && estado.status === 200){
             var rpt = estado.responseText;
-            if(rpt == "False" && mensajeProgramado.innerText.includes("Se regara en")){
+            if(rpt == "False" && (mensajeProgramado.innerText.includes("Se regara") || mensajeProgramado.innerText.includes("Se encenderan las luces"))){
                 mensajeProgramado.innerText = "";
                 formRegar.classList.remove('Programado');
             }
