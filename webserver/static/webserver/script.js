@@ -189,6 +189,9 @@ function rptProgramar(processRpt){
             console.log("rptProgramar");
             console.log(Respuesta);
             if(mensajeProgramado){
+                if(!formRegar.classList.contains('Programado')){
+                    formRegar.classList.add('Programado');
+                }
                 if(Respuesta === "Esperando la respuesta del dispositivo"){
                     mensajeProgramado.innerText = Respuesta;
                 }else if(Respuesta === "Comando no reconocido"){
