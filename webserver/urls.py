@@ -8,5 +8,6 @@ urlpatterns = [
     path("programar", views.programar, name="programar"),
     path("rcomando",views.rcomando,name="comando"),
     path("rptcomando",views.rptcomando,name="rptcomando"),
-    path("riegoprog", views.riegoprog, name="riegoprog")
+    path("riegoprog", views.riegoprog, name="riegoprog"),
+    path("encender", views.encender, name="encender")
 ]

@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     setTimeout(updateGota,time);
     setTimeout(rptProgramar,time);
     setTimeout(estadoRegadoProgramado,time);
+    setTimeout(updateLuz,time);
 });
 
 const humDiv = document.getElementById('number');
@@ -41,7 +42,7 @@ function updateHumedad(processHum){
     setTimeout(updateHumedad, time);
 }
 
-function onPressed(button) {
+function onPressedGota(button) {
     let req = new XMLHttpRequest();
     if(button.checked)
         req.open("POST", url_ + "/regar?state=1",true);
@@ -72,6 +73,40 @@ function updateGota(processGota){
 
     gotre.open("GET", url_ + "/regar");
     gotre.send();
+    setTimeout(updateGota, time);
+}
+
+function onPressedLuz(button){
+    let req = new XMLHttpRequest();
+    if(button.checked)
+        req.open("POST", url_ + "/encender?state=1",true);
+    else
+        req.open("POST", url_ + "/encender?state=0",true);
+    req.send();
+}
+
+const luz = document.getElementById('luz');
+const labelLuz = document.getElementById('lLuz');
+
+function updateLuz(processGota){
+    let luzre = new XMLHttpRequest();
+
+    luzre.onreadystatechange = () => {
+        if(luzre.readyState === 4 && luzre.status === 200){
+            
+            var regadoForzado = luzre.responseText;
+            console.log(regadoForzado);
+            if(regadoForzado === "true"){
+                luz.checked = true;
+            }
+            else if (regadoForzado === "false"){
+                luz.checked = false;
+            }
+        }
+    }
+
+    luzre.open("GET", url_ + "/encender");
+    luzre.send();
     setTimeout(updateGota, time);
 }
 

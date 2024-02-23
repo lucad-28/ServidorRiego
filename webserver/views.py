@@ -28,6 +28,7 @@ def index(request):
     return render(request, "webserver/index.html", {
         'humedad': percenHum,
         'regarForzado': regarForzado,
+        'lucesForzadas': encenderLuces,
         'regadoProgramado': comando['recibido'] == True,
         'esperandoRespuesta': comando['recibido'] == True and comando['respuesta']['recibida'] == False
     })
@@ -53,6 +54,17 @@ def regar(request):
         return HttpResponse(f"Regar actualizado a: {regarForzado}", content_type="text/plain")
     elif request.method == 'GET':
         return HttpResponse(str(regarForzado).lower(), content_type="text/plain")
+
+@csrf_exempt 
+def encender(request):
+    global encenderLuces
+    if request.method == 'POST':
+        valor = request.GET.get('state')
+        encenderLuces = bool(int(valor))
+        print(f"{encenderLuces}, {valor}")
+        return HttpResponse(f"Encender actualizado a: {encenderLuces}", content_type="text/plain")
+    elif request.method == 'GET':
+        return HttpResponse(str(encenderLuces).lower(), content_type="text/plain")
 
 @csrf_exempt
 def programar(request):

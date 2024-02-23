@@ -26,15 +26,27 @@
             </svg>
             
         </div>
-        <div class="toggle-container">
-            {% if regarForzado %}
-                <input type="checkbox" id="gota" onchange="onPressed(this)" checked="true">
-                <label for="gota" class="toggle-label" id = "lGota">Gota</label>
-            {% else %}
-                <input type="checkbox" id="gota" onchange="onPressed(this)" checked="false">
-                <label for="gota" class="toggle-label" id = "lGota">Gota</label>
-            {% endif %}
+        <div class="botones-contenedor">
+            <div class="toggle-container">
+                {% if regarForzado %}
+                    <input type="checkbox" id="gota" onchange="onPressedGota(this)" checked="true">
+                    <label for="gota" class="toggle-label" id = "lGota">Gota</label>
+                {% else %}
+                    <input type="checkbox" id="gota" onchange="onPressedGota(this)" checked="false">
+                    <label for="gota" class="toggle-label" id = "lGota">Gota</label>
+                {% endif %}
+            </div>
+            <div class="luz-container">
+                {% if lucesForzadas %}
+                    <input type="checkbox" id="luz" onchange="onPressedLuz(this)" checked="true">
+                    <label for="luz" class="ball" id="lLuz">Luz</label>
+                {% else %}
+                    <input type="checkbox" id="luz" onchange="onPressedLuz(this)" checked="false">
+                    <label for="luz" class="ball" id="lLuz">Luz</label>
+                {% endif %}
+            </div>
         </div>
+        
         <div class="formRiego {% if regadoProgramado %}Programado{% endif %}">
             
             <div class="HoraProgramada" id="MensajeProgramado">
