@@ -1,5 +1,5 @@
 const time=100;
-const url_ = "http://127.0.0.1:8000/webserver"     
+const url_ = "http://127.0.0.1:8000/webserver"
 var regando = "";
 
 document.addEventListener('DOMContentLoaded', ()=>{
@@ -42,12 +42,23 @@ function updateHumedad(processHum){
     setTimeout(updateHumedad, time);
 }
 
+/*
 function onPressedGota(button) {
     let req = new XMLHttpRequest();
     if(button.checked)
         req.open("POST", url_ + "/regar?state=1",true);
     else
         req.open("POST", url_ + "/regar?state=0",true);
+    req.send();
+}
+*/
+
+function onPressedGota(button) {
+    let req = new XMLHttpRequest();
+    if(button.checked)
+        req.open("POST", url_ + "/rcomando?boton=1&modo=regarInmediato",true);
+    else
+        req.open("POST", url_ + "/rcomando?boton=1&modo=apagarregadoInmediato",true);
     req.send();
 }
 
@@ -59,7 +70,7 @@ function updateGota(processGota){
 
     gotre.onreadystatechange = () => {
         if(gotre.readyState === 4 && gotre.status === 200){
-            
+
             var regadoForzado = gotre.responseText;
             console.log(regadoForzado);
             if(regadoForzado === "true"){
@@ -76,12 +87,22 @@ function updateGota(processGota){
     setTimeout(updateGota, time);
 }
 
+/*
 function onPressedLuz(button){
     let req = new XMLHttpRequest();
     if(button.checked)
         req.open("POST", url_ + "/encender?state=1",true);
     else
         req.open("POST", url_ + "/encender?state=0",true);
+    req.send();
+}
+*/
+function onPressedLuz(button){
+    let req = new XMLHttpRequest();
+    if(button.checked)
+        req.open("POST", url_ + "/rcomando?boton=1&modo=lucesInmediato",true);
+    else
+        req.open("POST", url_ + "/rcomando?boton=1&modo=apagarlucesInmediato",true);
     req.send();
 }
 
@@ -93,7 +114,7 @@ function updateLuz(processGota){
 
     luzre.onreadystatechange = () => {
         if(luzre.readyState === 4 && luzre.status === 200){
-            
+
             var regadoForzado = luzre.responseText;
             console.log(regadoForzado);
             if(regadoForzado === "true"){
@@ -107,7 +128,7 @@ function updateLuz(processGota){
 
     luzre.open("GET", url_ + "/encender");
     luzre.send();
-    setTimeout(updateGota, time);
+    setTimeout(updateLuz, time);
 }
 
 function show(anything){
@@ -127,7 +148,7 @@ flecha.onclick = function(){
     var modo = document.getElementById('modoProgramado').textContent.toLowerCase().replace(" ","");
     var duracion = parseInt(document.getElementById('duracionRiego').value);
     var timer = document.getElementById('timer').value;
-    console.log(String(modo) + " " + duracion + " " + timer);  
+    console.log(String(modo) + " " + duracion + " " + timer);
     /*
     var programado = {
         modalidad: modo,
@@ -201,7 +222,7 @@ micro.onclick = function(){
                 console.log("comando enviado" + comandoenviado)
                 enviarComando();
             }
-        },1000);      
+        },1000);
     }
 }
 
@@ -210,38 +231,33 @@ function enviarComando(){
     rcom.open("POST", url_ + "/rcomando?contenido="+ comandoenviado);
     comandoenviado = "";
     rcom.send();
-    
+
     formRegar.classList.add('Programado');
 }
 
 var mensajeProgramado = document.getElementById('MensajeProgramado');
 function rptProgramar(processRpt){
     let rpt = new XMLHttpRequest();
-    
+
     rpt.onreadystatechange = () => {
         if(rpt.readyState === 4 && rpt.status === 200){
             var Respuesta = rpt.responseText;
             console.log("rptProgramar");
             console.log(Respuesta);
             if(mensajeProgramado){
-                
+
                 if(Respuesta === "Esperando la respuesta del dispositivo"){
                     if(!formRegar.classList.contains('Programado')){
                         formRegar.classList.add('Programado');
                     }
                     mensajeProgramado.innerText = Respuesta;
                 }else if(Respuesta === "Comando no reconocido"){
-                    
                     mensajeProgramado.innerText = Respuesta;
                     setTimeout(function(){
                         formRegar.classList.remove('Programado');
                     },1000);
-                }else if(Respuesta.includes("Se regara")){
-                    if(!formRegar.classList.contains('Programado')){
-                        formRegar.classList.add('Programado');
-                    }
-                    mensajeProgramado.innerText = Respuesta;
-                }else if(Respuesta.includes("Se encenderan")){
+                }else if(Respuesta.includes("Se regara") || Respuesta.includes("Se encenderan")
+                            || Respuesta.includes("Se apagara")){
                     if(!formRegar.classList.contains('Programado')){
                         formRegar.classList.add('Programado');
                     }
@@ -250,7 +266,7 @@ function rptProgramar(processRpt){
             }else{
                 mensajeProgramado = document.getElementById('MensajeProgramado');
             }
-            
+
         }
     }
 
@@ -261,11 +277,12 @@ function rptProgramar(processRpt){
 
 function estadoRegadoProgramado(processEst){
     let estado = new XMLHttpRequest();
-    
+
     estado.onreadystatechange = () => {
         if(estado.readyState === 4 && estado.status === 200){
             var rpt = estado.responseText;
-            if(rpt == "False" && (mensajeProgramado.innerText.includes("Se regara") || mensajeProgramado.innerText.includes("Se encenderan las luces"))){
+            if(rpt == "False" && (mensajeProgramado.innerText.includes("Se regara") || mensajeProgramado.innerText.includes("Se encenderan")
+            || mensajeProgramado.innerText.includes("Se apagara"))){
                 mensajeProgramado.innerText = "";
                 formRegar.classList.remove('Programado');
             }
@@ -273,5 +290,5 @@ function estadoRegadoProgramado(processEst){
     }
     estado.open("GET", url_ + "/riegoprog");
     estado.send();
-    setTimeout(estadoRegadoProgramado, time);    
+    setTimeout(estadoRegadoProgramado, time);
 }

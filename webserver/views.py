@@ -95,27 +95,33 @@ def rcomando(request):
             comando['contenido'] = f"&{request.GET.get('modo')}, {request.GET.get('duracion')}, {request.GET.get('timer')}"
             solicitudRegado['modo'] = request.GET.get('modo')
             solicitudRegado['duracion'] = request.GET.get('duracion')
-            solicitudRegado['timer'] = request.GET.get('timer')  
+            solicitudRegado['timer'] = request.GET.get('timer')
+        elif(request.GET.get('boton')):
+            comando['contenido'] = f"&{request.GET.get('modo')}, 0, seg"
+            solicitudRegado['modo'] = request.GET.get('modo')
+            solicitudRegado['duracion'] = 0
+            solicitudRegado['timer'] = "seg"
         else:
             mensaje = request.GET.get('contenido')
+
             modo, duracion, timer = examinar_mensaje(mensaje)
             solicitudRegado['modo'] = modo
             solicitudRegado['duracion'] = duracion
             solicitudRegado['timer'] = timer
-            comando['contenido'] = f"{modo}, {duracion}, {timer}" 
+            comando['contenido'] = f"{modo}, {duracion}, {timer}"
             if modo == "lucesInmediato":
                 encenderLuces = True
                 solicitudRegado['duracion'] = 0
                 solicitudRegado['timer'] = 'seg'
-                comando['contenido'] = f"{modo}, {solicitudRegado['duracion']}, {solicitudRegado['timer']}" 
+                comando['contenido'] = f"{modo}, {solicitudRegado['duracion']}, {solicitudRegado['timer']}"
                 return HttpResponse(f"Luces encendidas", content_type="text/plain")
             if modo == "regarInmediato":
                 regarForzado = True
                 solicitudRegado['duracion'] = 0
                 solicitudRegado['timer'] = 'seg'
-                comando['contenido'] = f"{modo}, {solicitudRegado['duracion']}, {solicitudRegado['timer']}" 
+                comando['contenido'] = f"{modo}, {solicitudRegado['duracion']}, {solicitudRegado['timer']}"
                 return HttpResponse(f"Regado iniciado", content_type="text/plain")
-        
+
         print(f"Comando recibido: {comando['recibido']} y contenido {comando['contenido']}")
         return HttpResponse("Comando ingresado con exito", content_type ="text/plain")
     elif request.method == 'GET':
@@ -126,7 +132,7 @@ def rcomando(request):
             return HttpResponse("Comando no recibido", content_type="text/plain")
 @csrf_exempt
 def rptcomando(request):
-    global comando, solicitudRegado
+    global comando, solicitudRegado, regarForzado, encenderLuces
     if request.method == 'POST':
         comando['respuesta']['valido'] = request.GET.get('estado')
         comando['respuesta']['recibida'] = True
@@ -145,7 +151,11 @@ def rptcomando(request):
                     return HttpResponse(f"Se encenderan las luces", content_type="text/plain")
                 elif(solicitudRegado['modo'] == "regarInmediato"):
                     return HttpResponse(f"Se regara de inmediato", content_type="text/plain")
-                
+                elif(solicitudRegado['modo'] == "apagarregadoInmediato"):
+                    return HttpResponse(f"Se apagara el regado de inmediato", content_type="text/plain")
+                elif(solicitudRegado['modo'] == "apagarlucesInmediato"):
+                    return HttpResponse(f"Se apagaran las luces de inmediato", content_type="text/plain")
+
             elif comando['respuesta']['valido'] == "invalido":
                 comando['recibido'] = False
                 comando['contenido'] = ""
@@ -160,7 +170,7 @@ def rptcomando(request):
 
 @csrf_exempt
 def riegoprog(request):
-    global solicitudRegado
+    global solicitudRegado, regarForzado, encenderLuces, comando
     if request.method == 'POST':
         if request.GET.get('pendiente'):
             print(f"{request.GET.get('pendiente')}")
@@ -170,22 +180,33 @@ def riegoprog(request):
             comando['respuesta']['valido'] = ""
             comando['respuesta']['recibida'] = False
             solicitudRegado['pendiente'] = False
+            if(solicitudRegado['modo'] == "regaren" or solicitudRegado['modo'] == "regarInmediato"):
+                regarForzado = True
+            elif(solicitudRegado['modo'] == "apagarregadoInmediato"):
+                regarForzado = False
+            elif(solicitudRegado['modo'] == "lucesInmediato" or solicitudRegado['modo'] == "lucesen"):
+                encenderLuces = True
+            elif(solicitudRegado['modo'] == "apagarlucesInmediato"):
+                encenderLuces = False
         return HttpResponse(f"Solicitud pendiente cambiada a {solicitudRegado['pendiente']}",content_type="text/plain")
     elif request.method == 'GET':
         return HttpResponse(f"{solicitudRegado['pendiente']}", content_type="text/plain")
-    
+
 def examinar_mensaje(mensaje):
-        
+
     # Patrón de expresión regular para buscar la palabra clave, el número y la unidad de tiempo
+
     patronregar = r'(enc(?:iende|ender)|activ(?:a|ar|es)|prend(?:e|er|as))\s+?(?:el sistema|sistema|el regado|regado)\s+(?:en|dentro de)\s+(\d+)\s+(segundos?|minutos?|horas?)'
     patronregarInmediato = r'(enc(?:iende|ender)|activ(?:a|ar|es)|prend(?:e|er|as))\s+?(?:el sistema?|sistema?|el regado?|regado?)'
     patronluz = r'(enc(?:iende|ender)|activ(?:a|ar|es)|prend(?:e|er|as))\s+?(?:las luces|luces|la luz|el led)\s+(?:en|dentro de)\s+(\d+)\s+(segundos?|minutos?|horas?)'
     patronluzInmediato = r'(enc(?:iende|ender)|activ(?:a|ar|es)|prend(?:e|er|as))\s+?(?:las luces?|luces?|la luz?|el led?)'
+
     # Buscar coincidencias en el mensaje
     coincidencias = re.search(patronregar, mensaje, re.IGNORECASE)
     modo = ""
     numero = 0
     unidad_tiempo = ""
+
     if coincidencias:
         palabra_clave = coincidencias.group(1)
         numero = int(coincidencias.group(2))
@@ -215,4 +236,6 @@ def examinar_mensaje(mensaje):
                     numero = None
                     unidad_tiempo = None
 
+
     return modo, numero, unidad_tiempo
+
