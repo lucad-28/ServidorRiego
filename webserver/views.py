@@ -197,9 +197,9 @@ def examinar_mensaje(mensaje):
     # Patrón de expresión regular para buscar la palabra clave, el número y la unidad de tiempo
 
     patronregar = r'(enc(?:iende|ender)|activ(?:a|ar|es)|prend(?:e|er|as))\s+?(?:el sistema|sistema|el regado|regado)\s+(?:en|dentro de)\s+(\d+)\s+(segundos?|minutos?|horas?)'
-    patronregarInmediato = r'(enc(?:iende|ender)|activ(?:a|ar|es)|prend(?:e|er|as))\s+?(?:el sistema?|sistema?|el regado?|regado?)'
+    patronregarInmediato = r'(enc(?:iende|ender)|activ(?:a|ar|es)|prend(?:e|er|as))\s+?(?:el sistema?|sistema?|el regado?|regado?)$'
     patronluz = r'(enc(?:iende|ender)|activ(?:a|ar|es)|prend(?:e|er|as))\s+?(?:las luces|luces|la luz|el led)\s+(?:en|dentro de)\s+(\d+)\s+(segundos?|minutos?|horas?)'
-    patronluzInmediato = r'(enc(?:iende|ender)|activ(?:a|ar|es)|prend(?:e|er|as))\s+?(?:las luces?|luces?|la luz?|el led?)'
+    patronluzInmediato = r'(enc(?:iende|ender)|activ(?:a|ar|es)|prend(?:e|er|as))\s+?(?:las luces?|luces?|la luz?|el led?)$'
 
     # Buscar coincidencias en el mensaje
     coincidencias = re.search(patronregar, mensaje, re.IGNORECASE)
