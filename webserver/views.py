@@ -89,6 +89,8 @@ def programar(request):
 def rcomando(request):
     global comando, solicitudRegado, encenderLuces, regarForzado
     if request.method == 'POST':
+        if comando['recibido'] == True:
+            return HttpResponse("Solicitud en progreso", content_type="text/plain")
         comando['recibido'] = True
         comando['respuesta']['recibida'] = False
         if(request.GET.get('via')):
